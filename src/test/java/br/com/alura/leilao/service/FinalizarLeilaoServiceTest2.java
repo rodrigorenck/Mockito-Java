@@ -5,6 +5,7 @@ import br.com.alura.leilao.model.Lance;
 import br.com.alura.leilao.model.Leilao;
 import br.com.alura.leilao.model.Usuario;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -62,7 +63,22 @@ public class FinalizarLeilaoServiceTest2 {
         Mockito.verify(enviadorDeEmails).enviarEmailVencedorLeilao(leilao.getLanceVencedor());
     }
 
+    @Test()
+    @DisplayName("Nao deveria enviar o email para o vencedor caso de uma exception na hora de salvar o leilao no banco de dados")
+    public void naoDeveriaEnviarUmEmailParaLanceVencedorQuandoDerErroNaHoraDeSalvarLeilao(){
+        List<Leilao> leiloesExpirados = listaLeiloesExpirados();
+        //simular comportamento de um metodo
+        Mockito.when(dao.buscarLeiloesExpirados()).thenReturn(leiloesExpirados);
 
+        //mockito.any -> quando o parametro nao eh importante -> eh para ter esse comportamento independente do parametro
+        Mockito.when(dao.salvar(Mockito.any())).thenThrow(RuntimeException.class);
+
+        try {
+            service.finalizarLeiloesExpirados();
+        }catch (RuntimeException e){
+        }
+        Mockito.verifyNoInteractions(enviadorDeEmails);
+    }
 
     private List<Leilao> listaLeiloesExpirados() {
         List<Leilao> listaLeilao = new ArrayList<>();
