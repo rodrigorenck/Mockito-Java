@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +23,15 @@ class FinalizarLeilaoServiceTest {
     @Mock
     private LeilaoDao leilaoDao;
 
+    @Mock
+    private EnviadorDeEmails enviadorDeEmails;
+
     @BeforeEach
     public void inicializar(){
         //diz para o Mockito criar um mock das classes que possuem a anotacao @Mock
         //eu poderia criar um mock com o Mockito.mock() tambem
         MockitoAnnotations.initMocks(this);
-        service = new FinalizarLeilaoService(leilaoDao);
+        service = new FinalizarLeilaoService(leilaoDao, enviadorDeEmails);
     }
 
     @Test

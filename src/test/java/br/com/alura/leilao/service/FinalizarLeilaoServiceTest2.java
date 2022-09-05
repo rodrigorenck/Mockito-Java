@@ -4,7 +4,6 @@ import br.com.alura.leilao.dao.LeilaoDao;
 import br.com.alura.leilao.model.Lance;
 import br.com.alura.leilao.model.Leilao;
 import br.com.alura.leilao.model.Usuario;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,12 +24,14 @@ public class FinalizarLeilaoServiceTest2 {
     FinalizarLeilaoService service;
     @Mock
     LeilaoDao dao;
+    @Mock
+    EnviadorDeEmails enviadorDeEmails;
 
     @BeforeEach
     public void inicizalizar() {
         //cria mock dos atributos que tem a anotacao @Mock
         MockitoAnnotations.initMocks(this);
-        service = new FinalizarLeilaoService(dao);
+        service = new FinalizarLeilaoService(dao, enviadorDeEmails);
     }
 
 
@@ -48,6 +49,20 @@ public class FinalizarLeilaoServiceTest2 {
         //verificar se o metodo foi chamado
         Mockito.verify(dao).salvar(leilao);
     }
+
+    @Test
+    public void deveriaEnviarUmEmailParaLanceVencedor(){
+        List<Leilao> leiloesExpirados = listaLeiloesExpirados();
+        //simular comportamento de um metodo
+        Mockito.when(dao.buscarLeiloesExpirados()).thenReturn(leiloesExpirados);
+
+        service.finalizarLeiloesExpirados();
+
+        Leilao leilao = leiloesExpirados.get(0);
+        Mockito.verify(enviadorDeEmails).enviarEmailVencedorLeilao(leilao.getLanceVencedor());
+    }
+
+
 
     private List<Leilao> listaLeiloesExpirados() {
         List<Leilao> listaLeilao = new ArrayList<>();

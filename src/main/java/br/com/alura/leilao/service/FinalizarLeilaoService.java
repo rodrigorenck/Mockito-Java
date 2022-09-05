@@ -1,10 +1,8 @@
 package br.com.alura.leilao.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.alura.leilao.dao.LeilaoDao;
@@ -16,12 +14,15 @@ public class FinalizarLeilaoService {
 
 	private LeilaoDao leiloes;
 
+	private EnviadorDeEmails enviadorDeEmails;
+
 	/**
 	 * Injecao de dependencia por construtor eh uma pratica melhor do que o Autowired,
 	 * pois conseguimos passar a classe Mockada na hora do teste
 	 */
-	public FinalizarLeilaoService(LeilaoDao leiloes){
+	public FinalizarLeilaoService(LeilaoDao leiloes, EnviadorDeEmails enviadorDeEmails){
 		this.leiloes = leiloes;
+		this.enviadorDeEmails = enviadorDeEmails;
 	}
 
 	public void finalizarLeiloesExpirados() {
@@ -31,7 +32,8 @@ public class FinalizarLeilaoService {
 			leilao.setLanceVencedor(maiorLance);
 			leilao.fechar();
 			leiloes.salvar(leilao);
-
+			//enviar um email para o lance vencedor
+			enviadorDeEmails.enviarEmailVencedorLeilao(leilao.getLanceVencedor());
 		});
 	}
 
